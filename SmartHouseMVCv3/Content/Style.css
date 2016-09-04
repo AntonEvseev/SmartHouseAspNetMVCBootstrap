@@ -1,0 +1,25 @@
+﻿body{       
+background-image: url('../../Content/Images/grey_wash_wall_2X.png');
+}
+.device {
+    float: left;
+    width: 250px;
+    height: 540px;
+    border: 1px double orange;
+    border-radius: 10px;
+    margin-left: 30px;
+    margin-top: 30px;
+}
+.but{
+position: absolute;
+bottom: 0px;
+left: 80px;
+}
+.inputMode{
+width: 100px;     
+float: left;
+}
+.buttonSet{
+width: 100px;
+float: left;        
+}

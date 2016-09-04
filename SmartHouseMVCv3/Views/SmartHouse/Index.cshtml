@@ -1,0 +1,147 @@
+﻿@using SmartHouseMVCv3
+@model IDictionary<int, Device>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SmartHouse</title>
+    <link href="~/Content/bootstrap.css" rel="stylesheet" />
+    <link href="~/Content/Style.css" rel="stylesheet" />
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col col-sm-1 col-sm-offset-5 col-md-1 col-md-offset-5 ">
+                <h2>SmartHouse</h2>
+            </div>
+        </div>
+        @using (Html.BeginForm("Add", "SmartHouse"))
+        {
+            <div class="row">
+                <div class="col-xs-12 col col-sm-12 col-md-12">
+                    <div>
+                        @Html.DropDownList("deviceType", (IEnumerable<SelectListItem>)ViewBag.DevicesList, new { @class = "form-control inputMode" })
+                        <input class="btn btn-primary buttonSet" type="submit" value="Добавить">
+                    </div>
+                </div>
+            </div>
+        }
+        @foreach (var item in Model)
+        {
+            <div class="device row">
+                <div class="col-xs-12 col col-sm-12 col-md-12">
+                    @* Добавление изображений в зависимости от девайса*@
+                    <div class="row">
+                        <div class="col-xs-4 col-xs-offset-4 col-sm-12 col-3-offset-1 col-md-12 col-md-offset-1">
+                            @if (item.Value is ILampMode && item.Value.Status == false)
+                            { <img src="~/Content/Images/LampOff.gif" alt="Лампа выключена" /><br /><br /> }
+                            @if (item.Value is ILampMode && item.Value.Status == true)
+                            { <img src="~/Content/Images/LampOn.gif" alt="Лампа включена" /><br /><br /> }
+                            @if (item.Value is IConditionerMode)
+                            {
+                                <img src="~/Content/Images/conditioner.png" alt="Кондиционер" /><br /><br />
+                            }
+                            @if (item.Value is IFridgeMode)
+                            {
+                                <img src="~/Content/Images/Fridge.png" alt="Холодильник" /><br /><br />
+                            }
+                            @if (item.Value is ISetChannel)
+                            {
+                                <img src="~/Content/Images/TV-Set.png" alt="Телевизор" /><br /><br />
+                            }
+                            @if (item.Value is ISetWave)
+                            {
+                                <img src="~/Content/Images/radio2.png" alt="Радио" /><br /><br />
+                            }
+                        </div>
+                    </div>
+                    @if (item.Value is IStatus && item.Value.Status == false)
+                    {
+                        <a id="@item.Key" class="btn btn-primary" href="/SmartHouse/OnMode/@item.Key">Включить</a><br /><br />
+                    }
+                    @if (item.Value is IStatus && item.Value.Status == true)
+                    {
+                        <a id="@item.Key" class="btn btn-primary" href="/SmartHouse/OffMode/@item.Key">Выключить</a><br /><br />
+                    }
+                    @if (item.Value is IConditionerMode)
+                    {
+                        using (Html.BeginForm("SetConditionerMode/" + item.Key, "SmartHouse"))
+                        {
+                            <span>Выберите режим:</span><br />
+                            @Html.DropDownList("conditionerMode", new SelectList(new[] { ConditionerMode.Cool.ToString(), ConditionerMode.Dry.ToString(), ConditionerMode.Fan.ToString(), ConditionerMode.Heat.ToString() }), (string)Session["ConditionerMode"], new { id = "conditionerMode" + item.Key, @class = "form-control inputMode" })
+                            <input class="btn btn-success buttonSet" value="Выбрать" type="submit" /><br /><br /><br />
+                        }
+                    }
+                    @if (item.Value is ISetTemp)
+                    {
+                        using (Html.BeginForm("SetTemp/" + item.Key, "SmartHouse"))
+                        {
+                            <span>Установите температуру:</span><br />
+                            @Html.TextBox("temp", "", new { id = item.Key, size = "3", @class = "form-control inputMode" })
+                            <input class="btn btn-success buttonSet" value="Установить" type="submit" /><br />
+                        }
+                    }
+                    @if (item.Value is ISetVolume)
+                    {
+                        using (Html.BeginForm("SetVolume/" + item.Key, "SmartHouse"))
+                        {
+                            <span>Установите громкость:</span><br />
+                            @Html.TextBox("volume", "", new { size = "3", @class = "form-control inputMode" })
+                            <input class="btn btn-success buttonSet" value="Установить" type="submit" /><br />
+                        }
+                        <a id="@item.Key" class="btn btn-primary" href="/SmartHouse/UpVolume/@item.Key"><span class="glyphicon glyphicon-chevron-up"></span></a>
+                        <a id="@item.Key" class="btn btn-primary" href="/SmartHouse/LessVolume/@item.Key"><span class="glyphicon glyphicon-chevron-down"></span></a><br /><br />
+                    }
+                    @if (item.Value is ILampMode)
+                    {
+                        using (Html.BeginForm("SetLampMode/" + item.Key, "SmartHouse"))
+                        {
+                            <span>Выберите режим:</span><br />
+                            @Html.DropDownList("lampMode", new SelectList(new[] { BrightnessLevel.High.ToString(), BrightnessLevel.Medium.ToString(), BrightnessLevel.Low.ToString() }), (string)Session["LampMode"], new { id = "lampMode" + item.Key, @class = "form-control inputMode" })
+                            <input class="btn btn-success buttonSet" value="Выбрать" type="submit" />
+                        }
+                    }
+                    @if (item.Value is IFridgeMode)
+                    {
+                        using (Html.BeginForm("SetFridgeMode/" + item.Key, "SmartHouse"))
+                        {
+                            <span>Выберите режим:</span><br />
+                            @Html.DropDownList("fridgeMode", new SelectList(new[] { FridgeMode.Defrost.ToString(), FridgeMode.Freezing.ToString(), FridgeMode.Superfreezing.ToString() }), (string)Session["FridgeMode"], new { id = "fridgeMode" + item.Key, @class = "form-control inputMode" })
+                            <input class="btn btn-success buttonSet" value="Выбрать" type="submit" /><br />
+                        }
+                    }
+                    @if (item.Value is ISetChannel)
+                    {
+                        using (Html.BeginForm("SetChannel/" + item.Key, "SmartHouse"))
+                        {
+                            <span>Установите канал:</span><br />
+                            @Html.TextBox("channel", "", new { size = "3", @class = "form-control inputMode" })
+                            <input class="btn btn-success buttonSet" value="Установить" type="submit" /><br />
+                        }
+                        <a id="@item.Key" class="btn btn-primary" href="/SmartHouse/NextChannel/@item.Key"><span class="glyphicon glyphicon-chevron-up"></span></a>
+                        <a id="@item.Key" class="btn btn-primary" href="/SmartHouse/PreviousChannel/@item.Key"><span class="glyphicon glyphicon-chevron-down"></span></a>
+                    }
+                    @if (item.Value is ISetWave)
+                    {
+                        using (Html.BeginForm("SetWave/" + item.Key, "SmartHouse"))
+                        {
+                            <span>Установите волну:</span><br />
+                            @Html.TextBox("wave", "", new { size = "4", @class = "form-control inputMode" })
+                            <input class="btn btn-success buttonSet" value="Установить" type="submit" /><br />
+                        }
+                        <a id="@item.Key" class="btn btn-primary" href="/SmartHouse/UpWave/@item.Key"><span class="glyphicon glyphicon-chevron-up"></span></a>
+                        <a id="@item.Key" class="btn btn-primary" href="/SmartHouse/LessWave/@item.Key"><span class="glyphicon glyphicon-chevron-down"></span></a>
+                    }
+                    <br />
+                    <label class="error">@TempData["Error"]</label>
+                    <p class="status">Устройство: @item.Value.Name <br /> @item.Value.ToString()</p>
+                    <br /><br />@Html.ActionLink("Удалить", "Delete", new { id = item.Key }, new { @class = "btn btn-danger but" })
+                </div>
+            </div>
+        }
+    </div>
+    <script src="~/Scripts/jquery-1.10.2.min.js"></script>
+    <script src="~/Scripts/bootstrap.js"></script>
+</body>
+</html>
+
